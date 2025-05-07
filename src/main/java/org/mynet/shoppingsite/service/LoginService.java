@@ -47,7 +47,7 @@ public class LoginService {
                 user_ = customerRepository.findByUsername(username);
                 yield user_ != null && user_.getPassword().equals(password);
             }
-            default -> null;
+            default -> false;
         };
 
     }

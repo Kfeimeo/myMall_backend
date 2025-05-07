@@ -1,25 +1,26 @@
 package org.mynet.shoppingsite.controller;
 
-import org.mynet.shoppingsite.model.Category;
 import org.mynet.shoppingsite.model.Product;
 import org.mynet.shoppingsite.service.ProductService;
+import org.mynet.shoppingsite.service.UserSimilarityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/product")
 public class ProductController {
 
     private final ProductService productService;
+
+    private final UserSimilarityService userSimilarityService;
+
     @Autowired
-    public ProductController(ProductService productService) {
+    public ProductController(ProductService productService, UserSimilarityService userSimilarityService) {
         this.productService = productService;
+        this.userSimilarityService = userSimilarityService;
     }
 
     // 获取所有商品
@@ -28,21 +29,11 @@ public class ProductController {
         List<Product> products = productService.getAllProducts();
         return ResponseEntity.ok(products); // 返回 200 状态码，数据为产品列表
     }
-    // 获取所有产品种类
-    @GetMapping("/category")
-    public ResponseEntity<List<Category>> getAllCategories() {
-        try {
-            List<Category> categories = productService.getAllCategories();
-            if (categories == null) {
-                categories = List.of(); // 防止空指针异常
-            }
-            return ResponseEntity.ok(categories);
-        } catch (Exception e) {
-            // 记录日志
-            e.printStackTrace();
-            // 返回错误信息
-            return ResponseEntity.internalServerError().build();
-        }
+    //获取某个商家的所有销售的商品
+    @GetMapping("/seller/{sellerId}")
+    public ResponseEntity<List<Product>> getProductsBySellerId(@PathVariable Long sellerId) {
+        List<Product> products = productService.getProductsBySellerId(sellerId);
+        return ResponseEntity.ok(products);
     }
 
     // 获取单个商品
@@ -52,7 +43,7 @@ public class ProductController {
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
-
+    //添加产品
     @PostMapping
     public ResponseEntity<Product> addProduct(@RequestBody Product product) {
         try {
@@ -88,6 +79,13 @@ public class ProductController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    //推荐产品
+    @GetMapping("/recommend/{customerId}")
+    public ResponseEntity<List<Product>> recommendProducts(@PathVariable Long customerId) {
+        List<Product> recommendedProductIds = userSimilarityService.recommendProductsForUser(customerId);
+        return ResponseEntity.ok(recommendedProductIds);
     }
 
 

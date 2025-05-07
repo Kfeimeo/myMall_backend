@@ -12,9 +12,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class RegisterService {
-    private AdminRepository adminRepository;
-    private SellerRepository sellerRepository;
-    private CustomerRepository customerRepository;
+    private final AdminRepository adminRepository;
+    private final SellerRepository sellerRepository;
+    private final CustomerRepository customerRepository;
     @Autowired
     public RegisterService(AdminRepository adminRepository, SellerRepository sellerRepository, CustomerRepository customerRepository) {
         this.adminRepository = adminRepository;

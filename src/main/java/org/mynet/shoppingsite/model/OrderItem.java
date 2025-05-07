@@ -1,65 +1,43 @@
 package org.mynet.shoppingsite.model;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 
 @Entity
 @Table(name = "order_items")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class OrderItem {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long orderItemId;
-    @Column(name = "order_id",nullable = false)
-    Long orderId ;
 
-    @Column(name = "product_id", nullable = false)
-    private Long productId;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "order_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // 禁用懒加载代理的序列化
+    private Order order;
 
-    @Column(name = "quantity", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
+
+    @Column(nullable = false)
     private Integer quantity;
 
-    public OrderItem(Long productId, Integer quantity) {
-        this.productId = productId;
+
+    // 业务构造函数（不需要传ID）
+    public OrderItem(Order order, Product product, Integer quantity) {
+        this.order = order;
+        this.product = product;
         this.quantity = quantity;
     }
 
-    public OrderItem() {
-
-    }
-
-
-    // Getters and Setters
-
-    public Long getOrderItemId() {
-        return orderItemId;
-    }
-
-    public void setOrderItemId(Long orderItemId) {
-        this.orderItemId = orderItemId;
-    }
 
     public Long getProductId() {
-        return productId;
+        return getProduct().getId();
     }
-
-    public void setProductId(Long productId) {
-        this.productId = productId;
-    }
-
-    public void setOrderId(Long order_item_id) {
-        this.orderId = order_item_id;
-    }
-
-    public Long getOrderId() {
-        return orderId;
-    }
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
-
 }

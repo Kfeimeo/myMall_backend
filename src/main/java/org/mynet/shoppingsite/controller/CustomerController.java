@@ -7,21 +7,23 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.mynet.shoppingsite.model.CustomerUpdate;
+
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/customer")
 public class CustomerController {
 
-    private CustomerService customerService;
+    private final CustomerService customerService;
     @Autowired
     public CustomerController(CustomerService customerService) {
         this.customerService = customerService;
     }
 
     // 获取用户资料
-    @GetMapping("/customer/profile")
+    @GetMapping("/profile")
         public ResponseEntity<Map<String, Object>> getCustomerProfile(@RequestParam String username) {
         try {
             Customer customer = customerService.getCustomerByUsername(username);
@@ -40,7 +42,7 @@ public class CustomerController {
         }
     }
 
-    @PutMapping("/customer/profile")
+    @PutMapping("/profile")
     public ResponseEntity<Map<String, String>> updateCustomerProfile(@RequestBody CustomerUpdate udpate) {
         try {
             if(udpate.id == null){
@@ -56,7 +58,7 @@ public class CustomerController {
             return ResponseEntity.status(500).body(Map.of("message", "服务器错误"));
         }
     }
-    @DeleteMapping("/customer/{userId}")
+    @DeleteMapping("/{userId}")
     public ResponseEntity<String> deleteAccount(@PathVariable Long userId) {
         // 查找用户并删除
         Optional<Customer> customer = Optional.ofNullable(customerService.getCustomerById(userId));
@@ -67,9 +69,9 @@ public class CustomerController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("用户不存在");
     }
 
-    @GetMapping("/customer/all")
-    public ResponseEntity<Map<String, Object>> getAllCustomers() {
-        return ResponseEntity.ok(Map.of("customers", customerService.getAllCustomers()));
+    @GetMapping("/all")
+    public ResponseEntity<List<Customer>> getAllCustomers() {
+        return ResponseEntity.ok(customerService.getAllCustomers());
     }
 
 

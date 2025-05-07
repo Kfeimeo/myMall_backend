@@ -1,11 +1,8 @@
 package org.mynet.shoppingsite.service;
 
-import org.mynet.shoppingsite.model.Category;
 import org.mynet.shoppingsite.model.Product;
 import org.mynet.shoppingsite.model.ProductNotFoundException;
-import org.mynet.shoppingsite.repository.CategoryRepository;
 import org.mynet.shoppingsite.repository.ProductRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -16,11 +13,9 @@ import java.util.Optional;
 @Service
 public class ProductService {
     private final ProductRepository productRepository;
-    private final CategoryRepository categoryRepository;
 
-    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository) {
+    public ProductService(ProductRepository productRepository) {
         this.productRepository = productRepository;
-        this.categoryRepository = categoryRepository;
     }
 
 
@@ -50,9 +45,8 @@ public class ProductService {
                     product.setPrice(updatedProduct.getPrice());
                     product.setDescription(updatedProduct.getDescription());
                     product.setImage_url(updatedProduct.getImage_url());
-                    product.setCategory_id(updatedProduct.getCategory_id());
                     product.setStock(updatedProduct.getStock());
-                    product.setIs_active(updatedProduct.isIs_active());
+                    product.setIs_active(updatedProduct.getIs_active());
                     return productRepository.save(product);
                 }).orElseThrow(() -> new RuntimeException("Product not found"));
     }
@@ -63,7 +57,7 @@ public class ProductService {
                 .orElseThrow(() -> new ProductNotFoundException("商品未找到，ID：" + productId));
 
         // 如果状态相同，则直接返回，不做更新
-        if (product.isIs_active() == isActive) {
+        if (product.getIs_active() == isActive) {
             return product;
         }
 
@@ -78,7 +72,7 @@ public class ProductService {
         productRepository.deleteById(id);
     }
 
-    public List<Category> getAllCategories() {
-        return categoryRepository.findAll();
+    public List<Product> getProductsBySellerId(Long sellerId) {
+        return productRepository.findBySellerId(sellerId);
     }
 }

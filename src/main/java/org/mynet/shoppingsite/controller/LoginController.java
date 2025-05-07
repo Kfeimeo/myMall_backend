@@ -19,16 +19,18 @@ public class LoginController {
         this.loginService = loginService;
     }
 
-    @PostMapping("/admin")
-    public Map<String, Object> AdminLogin(@RequestBody Map<String, String> loginData) {
+    @PostMapping("/")
+    public Map<String, Object> Login(@RequestBody Map<String, String> loginData) {
         String username = loginData.get("username");
         String password = loginData.get("password");
+        String role = loginData.get("role");
         Map<String, Object> response = new HashMap<>();
-        boolean isValidUser = loginService.validateLogin(username, password,"ADMIN");
+        boolean isValidUser = loginService.validateLogin(username, password,role);
 
         if (isValidUser) {
             response.put("success", true);
             response.put("message", "登录成功");
+            response.put("userId", loginService.findIdByUsername(username,role));
         } else {
             response.put("success", false);
             response.put("message", "用户名或密码错误");
@@ -37,43 +39,6 @@ public class LoginController {
 
         return response;
     }
-
-   @PostMapping("/seller")
-   public Map<String, Object> SellerLogin(@RequestBody Map<String, String> loginData) {
-        String username = loginData.get("username");
-        String password = loginData.get("password");
-        Map<String, Object> response = new HashMap<>();
-        boolean isValidUser = loginService.validateLogin(username, password,"SELLER");
-
-        if (isValidUser) {
-            response.put("success", true);
-            response.put("message", "登录成功");
-        } else {
-            response.put("success", false);
-            response.put("message", "用户名或密码错误");
-        }
-
-        return response;
-   }
-
-   @PostMapping("/customer")
-    public Map<String, Object> CustomerLogin(@RequestBody Map<String, String> loginData) {
-        String username = loginData.get("username");
-        String password = loginData.get("password");
-        Map<String, Object> response = new HashMap<>();
-        boolean isValidUser = loginService.validateLogin(username, password,"CUSTOMER");
-        if (isValidUser) {
-            response.put("success", true);
-            response.put("message", "登录成功");
-            response.put("userID",loginService.findIdByUsername(username,"CUSTOMER"));
-            response.put("email",loginService.getCustomerByUsername(username).getEmail());
-            response.put("address",loginService.getCustomerByUsername(username).getAddress());
-        } else {
-            response.put("success", false);
-            response.put("message", "用户名或密码错误");
-        }
-        return response;
-   }
 
 
 }

@@ -3,7 +3,6 @@ package org.mynet.shoppingsite.controller;
 import org.mynet.shoppingsite.model.Order;
 import org.mynet.shoppingsite.model.OrderItem;
 import org.mynet.shoppingsite.model.OrderRequest;
-import org.mynet.shoppingsite.model.Sale;
 import org.mynet.shoppingsite.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,7 +17,7 @@ import java.util.Optional;
 @RequestMapping("/api/order")
 public class OrderController {
 
-    private OrderService orderService;
+    private final OrderService orderService;
     @Autowired
     public OrderController(OrderService orderService) {
         this.orderService = orderService;
@@ -47,8 +46,14 @@ public class OrderController {
 
     // 获取某用户的所有订单
     @GetMapping("/customer/{userId}/orders")
-    public ResponseEntity<List<Order>> getAllOrders(@PathVariable Long userId) {
+    public ResponseEntity<List<Order>> getAllOrdersOfCustomer(@PathVariable Long userId) {
         List<Order> orders = orderService.getOrdersByCustomerId(userId);
+        return ResponseEntity.ok(orders);
+    }
+    // 获取某用户的所有订单
+    @GetMapping("/seller/{userId}/orders")
+    public ResponseEntity<List<Order>> getAllOrdersOfSeller(@PathVariable Long userId) {
+        List<Order> orders = orderService.getOrdersBySellerId(userId);
         return ResponseEntity.ok(orders);
     }
 
@@ -70,6 +75,7 @@ public class OrderController {
             } catch (NumberFormatException e) {
 
                 // 处理异常，如忽略无效ID或返回错误
+                System.err.println("无效ID：" + id);
                 // 这里简单地忽略无效ID
             }
         }
@@ -93,9 +99,5 @@ public class OrderController {
             return ResponseEntity.status(400).body("取消订单失败，订单已发货或不存在");
         }
     }
-    @GetMapping("/sales")
-    public ResponseEntity<Sale> getTotalSales() {
-        Sale totalSales =orderService.calculateTotalSales();
-        return ResponseEntity.ok(totalSales);
-    }
+
 }
